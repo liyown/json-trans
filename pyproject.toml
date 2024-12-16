@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "json-trans"
-version = "0.1.0"
+version = "0.1.1"
 description = "A tool for translating JSON files from English to Chinese using Baidu Translate API"
 authors = ["CuiZhengPeng&Liuyaowen <liuyaowen_smile@126.com>"]
 license = "MIT"
