@@ -32,7 +32,7 @@ A Python tool for translating JSON files from English to Chinese, supporting bot
 pip install json-trans
 ```
 
-## Quick Start | 快��开始
+## Quick Start | 快速开始
 
 ### Using Baidu Translate API | 使用百度翻译API
 
@@ -186,7 +186,7 @@ result = translator.translate_to_chinese(text)
 1. 在[谷歌云控制台](https://console.cloud.google.com/)创建项目
 2. 启用云翻译API
 3. 创建服务账号并下载凭证
-4. 选择���下方式之一：
+4. 选择以下方式之一：
    - 设置GOOGLE_APPLICATION_CREDENTIALS环境变量
    - 或在代码中提供credentials_path
 
