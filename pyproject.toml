@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "json-trans"
+version = "0.1.0"
+description = "A tool for translating JSON files from English to Chinese using Baidu Translate API"
+authors = ["CuiZhengPeng&Liuyaowen <liuyaowen_smile@126.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/liyown/json-trans"
+repository = "https://github.com/liyown/json-trans"
+documentation = "https://github.com/liyown/json-trans#readme"
+keywords = ["json", "translation", "chinese", "baidu", "google"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.28.0"
+google-cloud-translate = "^3.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-cov = "^4.0.0"
+black = "^22.0.0"
+isort = "^5.0.0"
+mypy = "^1.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=json_trans --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["json_trans"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
