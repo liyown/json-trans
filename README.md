@@ -237,7 +237,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - CuiZhengPeng & Liuyaowen
 
-## Acknowledgments | 致��
+## Acknowledgments | 致谢
 
 - Thanks to Baidu Translate API and Google Cloud Translation API for providing translation services
 - Built with [Poetry](https://python-poetry.org/)
