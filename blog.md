@@ -150,7 +150,7 @@ translator = JsonTranslator(
 
 1. **选择性翻译**
    - 仔细选择需要翻译的字段
-   - 避免���译不需要翻译的技术字段
+   - 避免翻译不需要翻译的技术字段
 
 2. **错误处理**
    - 翻译失败时会保留原文
@@ -175,8 +175,8 @@ json-trans 是一个强大而灵活的 JSON 翻译工具，它可以显著提高
 
 ## 相关链接
 
-- [GitHub 仓库](https://github.com/yourusername/json-trans)
-- [完整文档](https://github.com/yourusername/json-trans#readme)
+- [GitHub 仓库](https://github.com/liyown/json-trans)
+- [完整文档](https://github.com/liyown/json-trans#readme)
 - [PyPI 页面](https://pypi.org/project/json-trans/)
 
 ## 作者

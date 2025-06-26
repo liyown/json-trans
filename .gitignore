@@ -20,6 +20,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.coverage
 
 # Virtual Environment
 .env
@@ -109,3 +110,9 @@ output/
 temp/
 *.bak
 *.tmp 
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example 

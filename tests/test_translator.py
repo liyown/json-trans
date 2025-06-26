@@ -4,8 +4,14 @@ Tests for the json-trans package.
 
 import json
 import os
+from pathlib import Path
 import pytest
 from unittest.mock import Mock, patch
+from dotenv import load_dotenv
+
+# 加载环境变量
+env_path = Path(__file__).parent.parent / '.env.test'
+load_dotenv(env_path)
 
 from json_trans import (
     JsonTranslator,
@@ -14,6 +20,14 @@ from json_trans import (
     translate_json_baidu,
     translate_json_google,
 )
+from json_trans.index import GeminiTranslator, translate_json_gemini
+
+# 从环境变量获取测试用的 API keys 和配置
+BAIDU_APP_ID = os.getenv('BAIDU_APP_ID', 'test_app_id')
+BAIDU_SECRET_KEY = os.getenv('BAIDU_SECRET_KEY', 'test_secret_key')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'test_api_key')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.0-flash-exp')
+GOOGLE_CREDENTIALS_PATH = os.getenv('GOOGLE_CREDENTIALS_PATH')
 
 # Test data
 SAMPLE_JSON = {
@@ -105,7 +119,7 @@ def test_json_translator_file_processing(sample_json_file, output_json_file):
     assert result["content"] == "翻译: This is test content"
     assert result["items"][0]["description"] == "翻译: First item description"
     assert result["items"][0]["content"] == "翻译: First item content"
-    assert result["title"] == "Test"  # 未指定翻译的字段保持不变
+    assert result["title"] == "Test"  # 未指定翻译的字段持不变
 
 @patch('json_trans.index.requests.get')
 def test_baidu_translator(mock_get):
@@ -117,7 +131,7 @@ def test_baidu_translator(mock_get):
     }
     mock_get.return_value = mock_response
     
-    translator = BaiduTranslator('test_id', 'test_key')
+    translator = BaiduTranslator(BAIDU_APP_ID, BAIDU_SECRET_KEY)
     result = translator.translate_to_chinese('test text')
     
     assert result == '测试文本'
@@ -147,8 +161,8 @@ def test_translate_json_baidu(sample_json_file, output_json_file):
         translate_json_baidu(
             sample_json_file,
             output_json_file,
-            'test_id',
-            'test_key',
+            BAIDU_APP_ID,
+            BAIDU_SECRET_KEY,
             fields_to_translate=["title", "content"]
         )
         
@@ -216,4 +230,106 @@ def test_empty_fields_list():
     translator = MockTranslator()
     with pytest.raises(ValueError):
         JsonTranslator(translator, fields_to_translate=[])
+
+@patch('json_trans.index.requests.post')
+def test_gemini_translator(mock_post):
+    """Test GeminiTranslator implementation"""
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        'candidates': [{
+            'content': {
+                'parts': [{
+                    'text': '测试文本'
+                }]
+            }
+        }]
+    }
+    mock_post.return_value = mock_response
+    
+    translator = GeminiTranslator(GEMINI_API_KEY, model=GEMINI_MODEL)
+    result = translator.translate_to_chinese('test text')
+    
+    assert result == '测试文本'
+    assert mock_post.called
+    
+    # 验证请求参数
+    call_args = mock_post.call_args
+    assert GEMINI_API_KEY in call_args[1]['params']['key']
+    assert 'test text' in call_args[1]['json']['contents'][0]['parts'][0]['text']
+
+@patch('json_trans.index.requests.post')
+def test_gemini_translator_with_custom_model(mock_post):
+    """Test GeminiTranslator implementation with custom model"""
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        'candidates': [{
+            'content': {
+                'parts': [{
+                    'text': '测试文本'
+                }]
+            }
+        }]
+    }
+    mock_post.return_value = mock_response
+    
+    translator = GeminiTranslator(
+        GEMINI_API_KEY,
+        model=GEMINI_MODEL,
+        role='translator'
+    )
+    result = translator.translate_to_chinese('test text')
+    
+    assert result == '测试文本'
+    assert mock_post.called
+    
+    # 验证请求参数
+    call_args = mock_post.call_args
+    # 检查 URL 中是否包含模型名称
+    assert GEMINI_MODEL in call_args[0][0]  # 第一个参数是 URL
+    assert 'translator' in call_args[1]['json']['contents'][0]['role']
+
+def test_translate_json_gemini(sample_json_file, output_json_file):
+    """Test gemini translation convenience function"""
+    with patch('json_trans.index.GeminiTranslator') as MockGeminiTranslator:
+        mock_translator = MockTranslator()
+        MockGeminiTranslator.return_value = mock_translator
+        
+        translate_json_gemini(
+            sample_json_file,
+            output_json_file,
+            GEMINI_API_KEY,
+            fields_to_translate=["title", "content"],
+            role="model"
+        )
+        
+        with open(output_json_file, 'r', encoding='utf-8') as f:
+            result = json.load(f)
+        
+        assert result["title"] == "翻译: Test"
+        assert result["content"] == "翻译: This is test content"
+        assert result["description"] == "This is a test description"  # 未翻译
+
+def test_translate_json_gemini_with_custom_model(sample_json_file, output_json_file):
+    """Test gemini translation convenience function with custom model"""
+    with patch('json_trans.index.GeminiTranslator') as MockGeminiTranslator:
+        mock_translator = MockTranslator()
+        MockGeminiTranslator.return_value = mock_translator
+        
+        translate_json_gemini(
+            sample_json_file,
+            output_json_file,
+            GEMINI_API_KEY,
+            fields_to_translate=["title", "content"],
+            model=GEMINI_MODEL,
+            role="translator"
+        )
+        
+        # 验证传递给 GeminiTranslator 的参数
+        MockGeminiTranslator.assert_called_once_with(
+            api_key=GEMINI_API_KEY,
+            model=GEMINI_MODEL,
+            role='translator'
+        )
   
